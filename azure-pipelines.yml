@@ -1,0 +1,40 @@
+trigger:
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  buildConfiguration: 'Release'
+  webAppName: 'asBitPromptStudioBackend'
+  azureServiceConnection: 'sc-bit-promptstudio-backend'
+
+steps:
+- checkout: self
+
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '8.x'
+
+- script: |
+    dotnet restore "BitPromptStudioBackend.sln"
+    dotnet build "BitPromptStudioBackend.sln" -c $(buildConfiguration) --no-restore
+    dotnet test "BitPromptStudioBackend.sln" -c $(buildConfiguration) --no-build
+    dotnet publish "BitPromptStudioBackend/BitPromptStudioBackend.csproj" -c $(buildConfiguration) --no-build -o "$(Build.ArtifactStagingDirectory)/publish"
+  displayName: 'Restore/Build/Test/Publish'
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.ArtifactStagingDirectory)/publish'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+    replaceExistingArchive: true
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: '$(azureServiceConnection)'
+    appType: 'webAppLinux'
+    appName: '$(webAppName)'
+    package: '$(Build.ArtifactStagingDirectory)/app.zip'

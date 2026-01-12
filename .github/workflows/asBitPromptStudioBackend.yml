@@ -1,0 +1,79 @@
+trigger:
+  branches:
+    include:
+      - develop  # o la rama de tu preferencia
+
+pool:
+  vmImage: 'ubuntu-latest'  # Configura el entorno de ejecución para Ubuntu
+
+variables:
+  AZURE_WEBAPP_NAME: 'asBitPromptStudioBackend'
+  AZURE_WEBAPP_PACKAGE_PATH: 'BitPromptStudioBackend/publish'
+  CONFIGURATION: 'Release'
+  DOTNET_CORE_VERSION: '8.0.x'
+  WORKING_DIRECTORY: 'BitPromptStudioBackend'
+
+jobs:
+- job: BuildAndDeploy
+  displayName: 'Compilar e implementar .NET Core en WebApp Azure'
+  steps:
+
+  - task: Checkout@1
+    displayName: 'Checkout Repository'
+
+  - task: UseDotNet@2
+    displayName: 'Setup .NET SDK'
+    inputs:
+      packageType: 'sdk'
+      version: $(DOTNET_CORE_VERSION)
+
+  - script: |
+      dotnet restore $(WORKING_DIRECTORY)
+    displayName: 'Restaurar dependencias'
+
+  - script: |
+      dotnet build $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-restore
+    displayName: 'Compilar'
+
+  - script: |
+      dotnet test $(WORKING_DIRECTORY) --no-build
+    displayName: 'Ejecutar pruebas'
+
+  - script: |
+      dotnet publish $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-build --output $(AZURE_WEBAPP_PACKAGE_PATH)
+    displayName: 'Publicar aplicación'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publicar artefactos'
+    inputs:
+      PathtoPublish: $(AZURE_WEBAPP_PACKAGE_PATH)
+      ArtifactName: 'webapp'
+      publishLocation: 'Container'
+
+- job: Deploy
+  displayName: 'Desplegar a Azure WebApp'
+  dependsOn: BuildAndDeploy
+  steps:
+
+  - task: DownloadBuildArtifacts@0
+    displayName: 'Descargar artefactos'
+    inputs:
+      buildType: 'current'
+      downloadPath: $(AZURE_WEBAPP_PACKAGE_PATH)
+
+  - task: AzureCLI@2
+    displayName: 'Azure Login'
+    inputs:
+      azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
+      scriptType: 'bash'
+      scriptLocation: 'inlineScript'
+      inlineScript: |
+        echo "Login to Azure"
+        az login --service-principal -u $(AzureSPNClientId) -p $(AzureSPNClientSecret) --tenant $(AzureSPNTenantId)
+  
+  - task: AzureWebApp@1
+    displayName: 'Deploy to Azure WebApp'
+    inputs:
+      azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
+      appName: $(AZURE_WEBAPP_NAME)
+      package: $(AZURE_WEBAPP_PACKAGE_PATH)

@@ -1,0 +1,6 @@
+@BitPromptStudioBackend_HostAddress = http://localhost:5142
+
+GET {{BitPromptStudioBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
