@@ -38,7 +38,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '8.0.0' # Pon tu versión
+        dotnet-version: '8.0' # Pon tu versión
 
     - name: Restore dependencies
       run: dotnet restore TuSolucion.sln
