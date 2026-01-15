@@ -12,6 +12,9 @@ jobs:
     permissions:
       actions: read
       contents: read
+      issues: write
+      pull-requests: write   # Necesario para que el bot comente alertas en el PR
+      checks: write
       security-events: write
 
     strategy:
@@ -32,8 +35,17 @@ jobs:
         # Si tienes consultas personalizadas (queries), van aquí.
 
     # 2. Intenta compilar el código automáticamente (necesario para C#, Java, Go, C++)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.0' # Pon tu versión
+
+    - name: Restore dependencies
+      run: dotnet restore TuSolucion.sln
+
+    - name: Build .NET
+      # Es vital usar --no-incremental para que CodeQL vea todo el código
+      run: dotnet build TuSolucion.sln --configuration Release --no-incremental
 
     # 3. Realiza el análisis y sube los resultados a la pestaña Security
     - name: Perform CodeQL Analysis
