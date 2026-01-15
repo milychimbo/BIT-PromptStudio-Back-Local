@@ -1,79 +1,125 @@
-trigger:
-  branches:
-    include:
-      - develop  # o la rama de tu preferencia
+name: "CodeQL Advanced Security"
 
-pool:
-  vmImage: 'ubuntu-latest'  # Configura el entorno de ejecución para Ubuntu
-
-variables:
-  AZURE_WEBAPP_NAME: 'asBitPromptStudioBackend'
-  AZURE_WEBAPP_PACKAGE_PATH: 'BitPromptStudioBackend/publish'
-  CONFIGURATION: 'Release'
-  DOTNET_CORE_VERSION: '8.0.x'
-  WORKING_DIRECTORY: 'BitPromptStudioBackend'
+on:
+  push:
+    branches: [ "develop" ]  
+  workflow_dispatch: # <--- Esto te permite ejecutarlo manualmente con un botón
 
 jobs:
-- job: BuildAndDeploy
-  displayName: 'Compilar e implementar .NET Core en WebApp Azure'
-  steps:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
 
-  - task: Checkout@1
-    displayName: 'Checkout Repository'
+    strategy:
+      fail-fast: false
+      matrix:
+        # Opciones comunes: 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
+        language: ['csharp' ] 
 
-  - task: UseDotNet@2
-    displayName: 'Setup .NET SDK'
-    inputs:
-      packageType: 'sdk'
-      version: $(DOTNET_CORE_VERSION)
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-  - script: |
-      dotnet restore $(WORKING_DIRECTORY)
-    displayName: 'Restaurar dependencias'
+    # 1. Inicializa el motor de CodeQL
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v3
+      with:
+        languages: ${{ matrix.language }}
+        # Si tienes consultas personalizadas (queries), van aquí.
 
-  - script: |
-      dotnet build $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-restore
-    displayName: 'Compilar'
+    # 2. Intenta compilar el código automáticamente (necesario para C#, Java, Go, C++)
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
 
-  - script: |
-      dotnet test $(WORKING_DIRECTORY) --no-build
-    displayName: 'Ejecutar pruebas'
+    # 3. Realiza el análisis y sube los resultados a la pestaña Security
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v3
+      with:
+        category: "/language:${{matrix.language}}"
 
-  - script: |
-      dotnet publish $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-build --output $(AZURE_WEBAPP_PACKAGE_PATH)
-    displayName: 'Publicar aplicación'
+# =======================================================================
+# =======================================================================
 
-  - task: PublishBuildArtifacts@1
-    displayName: 'Publicar artefactos'
-    inputs:
-      PathtoPublish: $(AZURE_WEBAPP_PACKAGE_PATH)
-      ArtifactName: 'webapp'
-      publishLocation: 'Container'
+# trigger:
+#   branches:
+#     include:
+#       - develop  # o la rama de tu preferencia
 
-- job: Deploy
-  displayName: 'Desplegar a Azure WebApp'
-  dependsOn: BuildAndDeploy
-  steps:
+# pool:
+#   vmImage: 'ubuntu-latest'  # Configura el entorno de ejecución para Ubuntu
 
-  - task: DownloadBuildArtifacts@0
-    displayName: 'Descargar artefactos'
-    inputs:
-      buildType: 'current'
-      downloadPath: $(AZURE_WEBAPP_PACKAGE_PATH)
+# variables:
+#   AZURE_WEBAPP_NAME: 'asBitPromptStudioBackend'
+#   AZURE_WEBAPP_PACKAGE_PATH: 'BitPromptStudioBackend/publish'
+#   CONFIGURATION: 'Release'
+#   DOTNET_CORE_VERSION: '8.0.x'
+#   WORKING_DIRECTORY: 'BitPromptStudioBackend'
 
-  - task: AzureCLI@2
-    displayName: 'Azure Login'
-    inputs:
-      azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        echo "Login to Azure"
-        az login --service-principal -u $(AzureSPNClientId) -p $(AzureSPNClientSecret) --tenant $(AzureSPNTenantId)
+# jobs:
+# - job: BuildAndDeploy
+#   displayName: 'Compilar e implementar .NET Core en WebApp Azure'
+#   steps:
+
+#   - task: Checkout@1
+#     displayName: 'Checkout Repository'
+
+#   - task: UseDotNet@2
+#     displayName: 'Setup .NET SDK'
+#     inputs:
+#       packageType: 'sdk'
+#       version: $(DOTNET_CORE_VERSION)
+
+#   - script: |
+#       dotnet restore $(WORKING_DIRECTORY)
+#     displayName: 'Restaurar dependencias'
+
+#   - script: |
+#       dotnet build $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-restore
+#     displayName: 'Compilar'
+
+#   - script: |
+#       dotnet test $(WORKING_DIRECTORY) --no-build
+#     displayName: 'Ejecutar pruebas'
+
+#   - script: |
+#       dotnet publish $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-build --output $(AZURE_WEBAPP_PACKAGE_PATH)
+#     displayName: 'Publicar aplicación'
+
+#   - task: PublishBuildArtifacts@1
+#     displayName: 'Publicar artefactos'
+#     inputs:
+#       PathtoPublish: $(AZURE_WEBAPP_PACKAGE_PATH)
+#       ArtifactName: 'webapp'
+#       publishLocation: 'Container'
+
+# - job: Deploy
+#   displayName: 'Desplegar a Azure WebApp'
+#   dependsOn: BuildAndDeploy
+#   steps:
+
+#   - task: DownloadBuildArtifacts@0
+#     displayName: 'Descargar artefactos'
+#     inputs:
+#       buildType: 'current'
+#       downloadPath: $(AZURE_WEBAPP_PACKAGE_PATH)
+
+#   - task: AzureCLI@2
+#     displayName: 'Azure Login'
+#     inputs:
+#       azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
+#       scriptType: 'bash'
+#       scriptLocation: 'inlineScript'
+#       inlineScript: |
+#         echo "Login to Azure"
+#         az login --service-principal -u $(AzureSPNClientId) -p $(AzureSPNClientSecret) --tenant $(AzureSPNTenantId)
   
-  - task: AzureWebApp@1
-    displayName: 'Deploy to Azure WebApp'
-    inputs:
-      azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
-      appName: $(AZURE_WEBAPP_NAME)
-      package: $(AZURE_WEBAPP_PACKAGE_PATH)
+#   - task: AzureWebApp@1
+#     displayName: 'Deploy to Azure WebApp'
+#     inputs:
+#       azureSubscription: 'sc-bit-promptstudio-backend'  # Aquí va tu nombre de conexión de servicio en Azure DevOps
+#       appName: $(AZURE_WEBAPP_NAME)
+#       package: $(AZURE_WEBAPP_PACKAGE_PATH)
