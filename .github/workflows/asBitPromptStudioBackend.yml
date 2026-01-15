@@ -1,9 +1,8 @@
 name: "CodeQL Advanced Security"
-
 on:
   push:
     branches: [ "develop" ]  
-  workflow_dispatch: # <--- Esto te permite ejecutarlo manualmente con un botón
+  workflow_dispatch:
 
 jobs:
   analyze:
@@ -13,32 +12,36 @@ jobs:
       actions: read
       contents: read
       issues: write
-      pull-requests: write   # Necesario para que el bot comente alertas en el PR
+      pull-requests: write
       checks: write
       security-events: write
-
+    
     strategy:
       fail-fast: false
       matrix:
-        # Opciones comunes: 'c-cpp', 'csharp', 'go', 'java-kotlin', 'javascript-typescript', 'python', 'ruby', 'swift'
-        language: ['csharp' ] 
-
+        language: ['csharp']
+    
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-
-    # 1. Inicializa el motor de CodeQL
+    
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        # Si tienes consultas personalizadas (queries), van aquí.
-
-    # 2. Intenta compilar el código automáticamente (necesario para C#, Java, Go, C++)
-    - name: Autobuild
-      uses: github/codeql-action/autobuild@v3
-
-    # 3. Realiza el análisis y sube los resultados a la pestaña Security
+    
+    # Compilación manual
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'  # Cambia según tu proyecto
+    
+    - name: Restore dependencies
+      run: dotnet restore
+    
+    - name: Build
+      run: dotnet build --configuration Release --no-restore
+    
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
       with:
