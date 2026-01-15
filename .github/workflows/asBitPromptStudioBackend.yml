@@ -37,7 +37,9 @@ jobs:
         dotnet-version: '8.0.x'  # Cambia según tu proyecto
     
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet add package System.Data.SqlClient --version 4.8.6
+        dotnet restore
     
     - name: Build
       run: dotnet build --configuration Release --no-restore
