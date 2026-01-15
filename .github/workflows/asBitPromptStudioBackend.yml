@@ -35,17 +35,8 @@ jobs:
         # Si tienes consultas personalizadas (queries), van aquí.
 
     # 2. Intenta compilar el código automáticamente (necesario para C#, Java, Go, C++)
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '8.0' # Pon tu versión
-
-    - name: Restore dependencies
-      run: dotnet restore TuSolucion.sln
-
-    - name: Build .NET
-      # Es vital usar --no-incremental para que CodeQL vea todo el código
-      run: dotnet build TuSolucion.sln --configuration Release --no-incremental
+    - name: Autobuild
+      uses: github/codeql-action/autobuild@v3
 
     # 3. Realiza el análisis y sube los resultados a la pestaña Security
     - name: Perform CodeQL Analysis
