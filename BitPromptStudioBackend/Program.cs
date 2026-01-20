@@ -52,5 +52,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.MapGet("/health", () => Results.Ok("OK"));
+app.MapGet("/", () => Results.Ok("API BitPromptStudio is running!"));
 
 app.Run();
