@@ -1,7 +1,7 @@
 name: "CodeQL Advanced Security"
 on:
-  push:
-    branches: [ "develop" ]  
+  # push:
+  #   branches: [ "develop" ]  
   workflow_dispatch:
 
 jobs:
