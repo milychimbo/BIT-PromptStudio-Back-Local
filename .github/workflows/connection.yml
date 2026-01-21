@@ -1,10 +1,10 @@
 name: Service Connection
 on:
+  workflow_dispatch:
   push:
     branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
-  workflow_dispatch:
 
 permissions:
   id-token: write # Requerido para solicitar el token OIDC
