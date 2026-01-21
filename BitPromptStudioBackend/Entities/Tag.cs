@@ -22,7 +22,7 @@ namespace BitPromptStudioBackend.Entities
         [ForeignKey("CreatedBy")]
         public User? Creator { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } // Removing default UtcNow to avoid inconsistency
         public bool IsActive { get; set; } = true;
     }
 }

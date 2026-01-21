@@ -10,10 +10,8 @@ namespace BitPromptStudioBackend.Entities
         public Guid Id { get; set; }
 
         public Guid PromptId { get; set; }
-        // We avoid navigation property back to Prompt here to minimize cycles, or manage it carefully. 
-        // usually it's fine.
+        
         [ForeignKey("PromptId")]
-        // Prevent cyclic reference in serialization if not careful, but needed for EF.
         public Prompt? Prompt { get; set; }
 
         public int VersionNumber { get; set; }
@@ -33,6 +31,6 @@ namespace BitPromptStudioBackend.Entities
         [ForeignKey("AuthorId")]
         public User? Author { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; }
     }
 }

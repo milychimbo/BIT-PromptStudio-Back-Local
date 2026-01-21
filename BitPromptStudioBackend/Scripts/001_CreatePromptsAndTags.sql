@@ -1,4 +1,4 @@
--- 1. Limpieza (Solo limpiar lo que crea este script para ser reentrante)
+-- 1. Cleanup
 IF OBJECT_ID('dbo.UserFavorites', 'U') IS NOT NULL DROP TABLE dbo.UserFavorites;
 IF OBJECT_ID('dbo.PromptTags', 'U') IS NOT NULL DROP TABLE dbo.PromptTags;
 IF OBJECT_ID('dbo.PromptVersions', 'U') IS NOT NULL DROP TABLE dbo.PromptVersions;
@@ -48,14 +48,13 @@ CREATE TABLE dbo.Prompts (
     Id UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
     Title NVARCHAR(200) NOT NULL,
     Description NVARCHAR(500) NULL,
-    ImageUrl NVARCHAR(500) NULL, -- Red Social: Imagen de portada
+    ImageUrl NVARCHAR(500) NULL, -- Social Media: Cover Image
     
-    -- Estadísticas Sociales
+    -- Social Stats
     ViewCount INT DEFAULT 0,
     UseCount INT DEFAULT 0,
-    -- FavoriteCount podría ser calculado o cacheado, aquí lo calcularemos dinámicamente o agregaremos campo si hay mucho tráfico.
     
-    -- Cache de la MEJOR versión
+    -- Cache of BEST version
     BestVersionId UNIQUEIDENTIFIER NULL, 
     BestVersionScore INT DEFAULT 0,
     
@@ -88,7 +87,7 @@ CREATE TABLE dbo.PromptVersions (
 GO
 
 ALTER TABLE dbo.Prompts ADD CONSTRAINT FK_Prompts_BestVersion 
-FOREIGN KEY (BestVersionId) REFERENCES dbo.PromptVersions(Id);
+FOREIGN KEY (BestVersionId) REFERENCES dbo.PromptVersions(Id) ON DELETE NO ACTION;
 GO
 
 -- 7. PromptTags
@@ -101,13 +100,13 @@ CREATE TABLE dbo.PromptTags (
 );
 GO
 
--- 8. UserFavorites (Nueva tabla social: Mis Favoritos)
+-- 8. UserFavorites (New social table: My Favorites)
 CREATE TABLE dbo.UserFavorites (
     UserId UNIQUEIDENTIFIER NOT NULL,
     PromptId UNIQUEIDENTIFIER NOT NULL,
     CreatedAt DATETIME DEFAULT GETDATE(),
     PRIMARY KEY (UserId, PromptId),
-    CONSTRAINT FK_UserFavorites_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id) ON DELETE NO ACTION, -- Evitar ciclos
+    CONSTRAINT FK_UserFavorites_Users FOREIGN KEY (UserId) REFERENCES dbo.Users(Id) ON DELETE NO ACTION, -- Avoid cycles
     CONSTRAINT FK_UserFavorites_Prompts FOREIGN KEY (PromptId) REFERENCES dbo.Prompts(Id) ON DELETE CASCADE
 );
 GO

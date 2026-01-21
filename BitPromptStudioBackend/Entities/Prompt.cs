@@ -30,12 +30,12 @@ namespace BitPromptStudioBackend.Entities
         public Guid CreatedBy { get; set; }
         [ForeignKey("CreatedBy")]
         public User? Creator { get; set; }
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } 
 
         public Guid LastUpdatedBy { get; set; }
         [ForeignKey("LastUpdatedBy")]
         public User? LastUpdater { get; set; }
-        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; }
 
         // Navigation property for BestVersion
         [ForeignKey("BestVersionId")]

@@ -26,7 +26,8 @@ namespace BitPromptStudioBackend.Entities
         [ForeignKey("RoleId")]
         public Role? Role { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; set; } // Removing default UtcNow
         public bool IsActive { get; set; } = true;
+        
     }
 }

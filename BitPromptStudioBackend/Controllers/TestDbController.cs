@@ -53,9 +53,11 @@ namespace BitPromptStudioBackend.Controllers
                 using var transaction = _context.Database.BeginTransaction();
                 try
                 {
-                    foreach (var command in commands)
+                    // Filter commands first as suggested by code review
+                    var validCommands = commands.Where(c => !string.IsNullOrWhiteSpace(c));
+                    
+                    foreach (var command in validCommands)
                     {
-                        if (string.IsNullOrWhiteSpace(command)) continue;
                         await _context.Database.ExecuteSqlRawAsync(command);
                     }
                     await transaction.CommitAsync();
