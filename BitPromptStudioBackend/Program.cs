@@ -1,7 +1,5 @@
 ﻿using BitPromptStudioBackend.Context;
-using BitPromptStudioBackend.Repositories.interfaces;
-using BitPromptStudioBackend.Repositories;
-using BitPromptStudioBackend.Services.interfaces;
+
 using BitPromptStudioBackend.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -21,8 +19,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     )
 );
 
-builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<ICategoriaService, CategoriaService>();
+
 
 builder.Services.Configure<AiFoundryOptions>(
     builder.Configuration.GetSection("AiFoundry")
