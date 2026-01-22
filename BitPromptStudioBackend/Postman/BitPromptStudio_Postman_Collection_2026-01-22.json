@@ -1,0 +1,215 @@
+{
+	"info": {
+		"_postman_id": "00000000-0000-0000-0000-000000000001",
+		"name": "BitPromptStudio API",
+		"description": "Collection for testing BitPromptStudio Backend APIs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Prompts",
+			"item": [
+				{
+					"name": "Get Prompts Feed",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prompts?page=1&pageSize=20",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prompts"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "pageSize",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Prompt Detail",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/prompts/{{promptId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prompts",
+								"{{promptId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Prompt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Data Analysis Assistant\",\n  \"description\": \"A prompt to help analyze CSV data\",\n  \"content\": \"You are a data analyst. Please analyze the following data...\",\n  \"tagIds\": [],\n  \"qualityScore\": 85,\n  \"anatomyAnalysisJson\": \"{\\\"rol\\\": {\\\"porcentaje\\\": 100, \\\"comentario\\\": \\\"Excellent role definition\\\"}}\",\n  \"detectedIssuesJson\": \"[]\",\n  \"suggestionsJson\": \"[]\",\n  \"createdByUserId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/prompts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prompts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Prompt Version",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"You are an expert data analyst. Please analyze...\",\n  \"qualityScore\": 90,\n  \"anatomyAnalysisJson\": \"{\\\"rol\\\": {\\\"porcentaje\\\": 100}}\",\n  \"detectedIssuesJson\": \"[]\",\n  \"suggestionsJson\": \"[]\",\n  \"authorId\": \"3fa85f64-5717-4562-b3fc-2c963f66afa6\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/prompts/{{promptId}}/versions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"prompts",
+								"{{promptId}}",
+								"versions"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Agent",
+			"item": [
+				{
+					"name": "Fix Prompt",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prompt\": \"Act as a python expert and write a script to scrape google.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/agent/fix-prompt",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"agent",
+								"fix-prompt"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "TestDb",
+			"item": [
+				{
+					"name": "Ping Database",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/testdb/ping",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"testdb",
+								"ping"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Run Migration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/testdb/run-migration?scriptName=001_CreatePromptsAndTags.sql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"testdb",
+								"run-migration"
+							],
+							"query": [
+								{
+									"key": "scriptName",
+									"value": "001_CreatePromptsAndTags.sql"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5031",
+			"type": "string"
+		},
+		{
+			"key": "promptId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
