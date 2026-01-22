@@ -151,6 +151,125 @@
 			]
 		},
 		{
+			"name": "Users & Roles",
+			"item": [
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By Id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sync User (Login)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"entraObjectId\": \"test-entra-id-002\",\n  \"email\": \"newuser@bit.com\",\n  \"fullName\": \"New User\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/sync",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"sync"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Role",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roleId\": \"{{adminRoleId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/users/{{userId}}/role",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"{{userId}}",
+								"role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/roles",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"roles"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "TestDb",
 			"item": [
 				{
@@ -173,7 +292,7 @@
 					"response": []
 				},
 				{
-					"name": "Run Migration",
+					"name": "Run Migration (Prompts)",
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -196,6 +315,31 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Run Migration (Seed Users)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/testdb/run-migration?scriptName=003_SeedUser.sql",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"testdb",
+								"run-migration"
+							],
+							"query": [
+								{
+									"key": "scriptName",
+									"value": "003_SeedUser.sql"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -203,11 +347,21 @@
 	"variable": [
 		{
 			"key": "baseUrl",
-			"value": "http://localhost:5031",
+			"value": "https://asbitpromptstudiobackend-czdsbsgpd8d2gacp.eastus-01.azurewebsites.net/",
 			"type": "string"
 		},
 		{
 			"key": "promptId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminRoleId",
 			"value": "",
 			"type": "string"
 		}
