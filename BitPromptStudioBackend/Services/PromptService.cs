@@ -125,8 +125,27 @@ namespace BitPromptStudioBackend.Services
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var prompt = await _context.Prompts.FindAsync(promptId) 
+                var prompt = await _context.Prompts
+                    .Include(p => p.PromptTags)
+                    .FirstOrDefaultAsync(p => p.Id == promptId)
                              ?? throw new KeyNotFoundException("Prompt not found");
+
+                // Update Metadata if provided
+                if (!string.IsNullOrEmpty(dto.Title)) prompt.Title = dto.Title;
+                if (dto.Description != null) prompt.Description = dto.Description;
+
+                // Update Tags if provided
+                if (dto.TagIds != null)
+                {
+                    // Remove existing
+                    _context.PromptTags.RemoveRange(prompt.PromptTags);
+                    
+                    // Add new
+                    foreach (var tagId in dto.TagIds)
+                    {
+                        _context.PromptTags.Add(new PromptTag { PromptId = prompt.Id, TagId = tagId });
+                    }
+                }
 
                 // Calculate next version number
                 var maxVersion = await _context.PromptVersions

@@ -23,6 +23,11 @@ namespace BitPromptStudioBackend.DTOs
 
     public class CreateVersionDto
     {
+        // Optional: Update Prompt Metadata
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public List<Guid>? TagIds { get; set; }
+
         public string Content { get; set; } = string.Empty;
         public int QualityScore { get; set; }
         
