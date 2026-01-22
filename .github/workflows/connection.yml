@@ -1,0 +1,32 @@
+name: Service Connection
+on:
+  workflow_dispatch:
+  # push:
+  #   branches: [ "develop" ]
+  # pull_request:
+  #   branches: [ "develop" ]
+
+permissions:
+  id-token: write # Requerido para solicitar el token OIDC
+  contents: read
+  
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+ 
+      # ESTE ES EL EQUIVALENTE A LA SERVICE CONNECTION
+      - name: Log in to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Runs a set of commands using the runners shell
+      - name: Run a multi-line script
+        run: |
+          echo Add other actions to build,
+          echo test, and deploy your project.
