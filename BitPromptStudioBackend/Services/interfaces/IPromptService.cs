@@ -9,5 +9,7 @@ namespace BitPromptStudioBackend.Services.interfaces
         Task<List<PromptDto>> GetFeedAsync(int page = 1, int pageSize = 20);
         Task<PromptDto?> GetPromptDetailAsync(Guid id);
         Task<PromptDto> AddVersionAsync(Guid promptId, CreateVersionDto dto);
+        Task<List<PromptVersionDto>> GetPromptVersionsAsync(Guid promptId);
+        Task<PromptVersionDto?> GetVersionDetailAsync(Guid versionId);
     }
 }

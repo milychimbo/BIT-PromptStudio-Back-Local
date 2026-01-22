@@ -23,6 +23,11 @@ namespace BitPromptStudioBackend.DTOs
 
     public class CreateVersionDto
     {
+        // Optional: Update Prompt Metadata
+        public string? Title { get; set; }
+        public string? Description { get; set; }
+        public List<Guid>? TagIds { get; set; }
+
         public string Content { get; set; } = string.Empty;
         public int QualityScore { get; set; }
         
@@ -38,6 +43,7 @@ namespace BitPromptStudioBackend.DTOs
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
         
         public int ViewCount { get; set; }
         public int UseCount { get; set; }
@@ -58,5 +64,21 @@ namespace BitPromptStudioBackend.DTOs
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
+    }
+
+    public class PromptVersionDto
+    {
+        public Guid Id { get; set; }
+        public int VersionNumber { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public int QualityScore { get; set; }
+        public DateTime CreatedAt { get; set; }
+        
+        public string AuthorName { get; set; } = string.Empty;
+
+        // Analysis details (can be null)
+        public string? AnatomyAnalysisJson { get; set; }
+        public string? DetectedIssuesJson { get; set; }
+        public string? SuggestionsJson { get; set; }
     }
 }
