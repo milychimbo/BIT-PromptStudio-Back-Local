@@ -1,6 +1,7 @@
 ﻿using BitPromptStudioBackend.Context;
 
 using BitPromptStudioBackend.Services;
+using BitPromptStudioBackend.Services.interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -24,6 +25,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.Configure<AiFoundryOptions>(
     builder.Configuration.GetSection("AiFoundry")
 );
+
+builder.Services.AddScoped<IPromptService, PromptService>();
 
 builder.Services.AddHttpClient<IAgenteService, AgenteService>((sp, http) =>
 {
