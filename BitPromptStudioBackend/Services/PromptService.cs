@@ -196,6 +196,50 @@ namespace BitPromptStudioBackend.Services
                 throw;
             }
         }
+        public async Task<List<PromptVersionDto>> GetPromptVersionsAsync(Guid promptId)
+        {
+            var versions = await _context.PromptVersions
+                .Include(v => v.Author)
+                .Where(v => v.PromptId == promptId)
+                .OrderByDescending(v => v.VersionNumber)
+                .ToListAsync();
+
+            return versions.Select(v => new PromptVersionDto
+            {
+                Id = v.Id,
+                VersionNumber = v.VersionNumber,
+                Content = v.Content,
+                QualityScore = v.QualityScore,
+                CreatedAt = v.CreatedAt,
+                AuthorName = v.Author?.FullName ?? "Desconocido",
+                // Analysis details omitted for list view
+                AnatomyAnalysisJson = null,
+                DetectedIssuesJson = null,
+                SuggestionsJson = null
+            }).ToList();
+        }
+
+        public async Task<PromptVersionDto?> GetVersionDetailAsync(Guid versionId)
+        {
+            var v = await _context.PromptVersions
+                .Include(v => v.Author)
+                .FirstOrDefaultAsync(v => v.Id == versionId);
+
+            if (v == null) return null;
+
+            return new PromptVersionDto
+            {
+                Id = v.Id,
+                VersionNumber = v.VersionNumber,
+                Content = v.Content,
+                QualityScore = v.QualityScore,
+                CreatedAt = v.CreatedAt,
+                AuthorName = v.Author?.FullName ?? "Desconocido",
+                AnatomyAnalysisJson = v.AnatomyAnalysisJson,
+                DetectedIssuesJson = v.DetectedIssuesJson,
+                SuggestionsJson = v.SuggestionsJson
+            };
+        }
 
         private static PromptDto MapToDto(Prompt p)
         {
