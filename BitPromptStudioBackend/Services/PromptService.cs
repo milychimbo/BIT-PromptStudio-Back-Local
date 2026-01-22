@@ -20,7 +20,7 @@ namespace BitPromptStudioBackend.Services
             // Business Rule: Only save if Quality Score >= 80
             if (dto.QualityScore < 80)
             {
-                throw new InvalidOperationException($"Cannot save prompt. Quality Score ({dto.QualityScore}%) is below the required 80%.");
+                throw new InvalidOperationException($"No se puede guardar el prompt. La puntuación de calidad ({dto.QualityScore}%) es inferior al 80% requerido.");
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
@@ -79,7 +79,7 @@ namespace BitPromptStudioBackend.Services
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return await GetPromptDetailAsync(prompt.Id) ?? throw new Exception("Failed to retrieve created prompt");
+                return await GetPromptDetailAsync(prompt.Id) ?? throw new Exception("Error al recuperar el prompt creado");
             }
             catch
             {
@@ -93,8 +93,9 @@ namespace BitPromptStudioBackend.Services
             var query = _context.Prompts
                 .Include(p => p.Creator)
                 .Include(p => p.LastUpdater)
+                .Include(p => p.BestVersion) // Include BestVersion for Content
                 .Include(p => p.PromptTags).ThenInclude(pt => pt.Tag)
-                .OrderByDescending(p => p.BestVersionScore) // Social Feed Logic: Best quality first? Or UpdatedAt?
+                .OrderByDescending(p => p.BestVersionScore)
                 .ThenByDescending(p => p.UpdatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize);
@@ -109,6 +110,7 @@ namespace BitPromptStudioBackend.Services
             var prompt = await _context.Prompts
                 .Include(p => p.Creator)
                 .Include(p => p.LastUpdater)
+                .Include(p => p.BestVersion) // Include BestVersion for Content
                 .Include(p => p.PromptTags).ThenInclude(pt => pt.Tag)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
@@ -120,7 +122,7 @@ namespace BitPromptStudioBackend.Services
         public async Task<PromptDto> AddVersionAsync(Guid promptId, CreateVersionDto dto)
         {
             if (dto.QualityScore < 80)
-                throw new InvalidOperationException($"Cannot save version. Quality Score ({dto.QualityScore}%) is below 80%.");
+                throw new InvalidOperationException($"No se puede guardar la versión. La puntuación de calidad ({dto.QualityScore}%) es inferior al 80%.");
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -128,7 +130,7 @@ namespace BitPromptStudioBackend.Services
                 var prompt = await _context.Prompts
                     .Include(p => p.PromptTags)
                     .FirstOrDefaultAsync(p => p.Id == promptId)
-                             ?? throw new KeyNotFoundException("Prompt not found");
+                             ?? throw new KeyNotFoundException("No se encontró el prompt");
 
                 // Update Metadata if provided
                 if (!string.IsNullOrEmpty(dto.Title)) prompt.Title = dto.Title;
@@ -186,7 +188,7 @@ namespace BitPromptStudioBackend.Services
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                return await GetPromptDetailAsync(promptId) ?? throw new Exception("Error retrieving updated prompt");
+                return await GetPromptDetailAsync(promptId) ?? throw new Exception("Error recuperando el prompt actualizado");
             }
             catch
             {
@@ -202,12 +204,13 @@ namespace BitPromptStudioBackend.Services
                 Id = p.Id,
                 Title = p.Title,
                 Description = p.Description ?? "",
+                Content = p.BestVersion?.Content ?? "", // Map content from BestVersion
                 ViewCount = p.ViewCount,
                 UseCount = p.UseCount,
                 BestVersionScore = p.BestVersionScore,
                 UpdatedAt = p.UpdatedAt,
-                CreatorName = p.Creator?.FullName ?? "Unknown",
-                LastUpdaterName = p.LastUpdater?.FullName ?? "Unknown",
+                CreatorName = p.Creator?.FullName ?? "Desconocido", // Spanish default
+                LastUpdaterName = p.LastUpdater?.FullName ?? "Desconocido", // Spanish default
                 Tags = p.PromptTags.Select(pt => new TagDto 
                 { 
                     Id = pt.TagId, 
