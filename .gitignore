@@ -362,3 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /BitPromptStudioBackend/appsettings.Development.json
+
+# Build logs and output
+build_*.txt
+build*.log
