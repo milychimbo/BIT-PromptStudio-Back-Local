@@ -96,10 +96,10 @@ namespace BitPromptStudioBackend.Services
         public async Task<UserDto> UpdateUserRoleAsync(Guid userId, Guid roleId)
         {
             var user = await _context.Users.FindAsync(userId);
-            if (user == null) throw new KeyNotFoundException("User not found");
+            if (user == null) throw new KeyNotFoundException("No se encontró el usuario");
 
             var role = await _context.Roles.FindAsync(roleId);
-            if (role == null) throw new KeyNotFoundException("Role not found");
+            if (role == null) throw new KeyNotFoundException("No se encontró el rol");
 
             user.RoleId = roleId;
             await _context.SaveChangesAsync();
