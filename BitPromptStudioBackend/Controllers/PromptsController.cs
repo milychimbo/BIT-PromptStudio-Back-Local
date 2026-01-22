@@ -69,5 +69,20 @@ namespace BitPromptStudioBackend.Controllers
                 return StatusCode(500, new { message = "An error occurred updating the prompt.", details = ex.Message });
             }
         }
+
+        [HttpGet("{id}/versions")]
+        public async Task<IActionResult> GetVersions(Guid id)
+        {
+            var result = await _promptService.GetPromptVersionsAsync(id);
+            return Ok(result);
+        }
+
+        [HttpGet("versions/{versionId}")]
+        public async Task<IActionResult> GetVersionDetail(Guid versionId)
+        {
+            var result = await _promptService.GetVersionDetailAsync(versionId);
+            if (result == null) return NotFound();
+            return Ok(result);
+        }
     }
 }

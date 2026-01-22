@@ -65,4 +65,20 @@ namespace BitPromptStudioBackend.DTOs
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
     }
+
+    public class PromptVersionDto
+    {
+        public Guid Id { get; set; }
+        public int VersionNumber { get; set; }
+        public string Content { get; set; } = string.Empty;
+        public int QualityScore { get; set; }
+        public DateTime CreatedAt { get; set; }
+        
+        public string AuthorName { get; set; } = string.Empty;
+
+        // Analysis details (can be null)
+        public string? AnatomyAnalysisJson { get; set; }
+        public string? DetectedIssuesJson { get; set; }
+        public string? SuggestionsJson { get; set; }
+    }
 }
