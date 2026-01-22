@@ -27,6 +27,7 @@ builder.Services.Configure<AiFoundryOptions>(
 );
 
 builder.Services.AddScoped<IPromptService, PromptService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddHttpClient<IAgenteService, AgenteService>((sp, http) =>
 {
